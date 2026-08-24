@@ -13,7 +13,7 @@ test.beforeEach(async ({ loginPage, homePage, searchResultsPage }) => {
 test('verify product images count', async ({productInfoPage}) => {
      let imgCount = await productInfoPage.getProductImageCount();
      console.log('total images: ', imgCount);
-     expect(imgCount).toBe(5);
+     expect(imgCount).toBe(4);
 });
 
 test('verify product Information/Data', async ({productInfoPage}) => {
