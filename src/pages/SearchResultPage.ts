@@ -22,7 +22,7 @@ async getProductSearchResultsCount(): Promise<number> {
 }
 
 async selectProduct(productName: string): Promise<void> {
-    const productLink = this.page.getByRole('link', { name: productName, exact: true });
+    const productLink = this.page.getByRole('link', { name: productName, exact: true }).first();
     await productLink.scrollIntoViewIfNeeded();
     await productLink.waitFor({ state: 'visible', timeout: 5000 });
     await productLink.click();
