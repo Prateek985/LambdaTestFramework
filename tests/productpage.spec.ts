@@ -19,11 +19,11 @@ test('verify product images count', async ({productInfoPage}) => {
 test('verify product Information/Data', async ({productInfoPage}) => {
      let actualProductInfoMap = await productInfoPage.getProductInfo();
      console.log('Actual Product Details:', actualProductInfoMap);
-     expect.soft(actualProductInfoMap.get('ProductHeader')).toBe(process.env.ProductHeader);
-     expect.soft(actualProductInfoMap.get('Brand')).toBe(process.env.Brand);
+     expect.soft(actualProductInfoMap.get('ProductHeader')).toBe("MacBook Pro");
+     expect.soft(actualProductInfoMap.get('Brand')).toBe("Apple");
      //expect.soft(actualProductInfoMap.get('Viewed')).toBe('89842');
-     expect.soft(actualProductInfoMap.get('Reward Points')).toBe(process.env.RewardPoints);
-     expect.soft(actualProductInfoMap.get('Availability')).toBe(process.env.Availability);
+     expect.soft(actualProductInfoMap.get('Reward Points')).toBe("800");
+     expect.soft(actualProductInfoMap.get('Availability')).toBe("In Stock");
 
 });
 
