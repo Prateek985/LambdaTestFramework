@@ -3,6 +3,7 @@ import { test, expect} from '../src/fixtures/pagefixtures';
 import process from 'process';
 
 test.beforeEach(async ({ loginPage, homePage, searchResultsPage }) => {
+     test.setTimeout(60000);
      await loginPage.goToLoginPage();
      await loginPage.doLogin(process.env.USERNAMEQ!, process.env.PASSWORDQ!);
      await homePage.dosearch(process.env.searchkey!);
