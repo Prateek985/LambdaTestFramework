@@ -77,8 +77,8 @@ pipeline {
                 dir('qa-tests') {
                     git url: 'https://github.com/Prateek985/LambdaTestFramework.git',
                         branch: 'master'
-                    sh 'npm ci'
-                    sh 'npx playwright install --with-deps chromium'
+                    bat 'npm ci'
+                    bat 'npx playwright install --with-deps chromium'
                 }
             }
         }
@@ -106,7 +106,7 @@ pipeline {
                         usernamePassword(credentialsId: 'dev-credentials',
                             usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')
                     ]) {
-                        sh '''
+                        bat '''
                             ENV=dev \
                             BASE_URL=$BASE_URL \
                             USERNAME=$USERNAME \
@@ -162,7 +162,7 @@ pipeline {
                         usernamePassword(credentialsId: 'qa-credentials',
                             usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')
                     ]) {
-                        sh '''
+                        bat '''
                             ENV=qa \
                             BASE_URL=$BASE_URL \
                             USERNAME=$USERNAME \
