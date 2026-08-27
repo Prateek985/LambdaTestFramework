@@ -1,0 +1,221 @@
+ ═══════════════════════════════════════════════════════════════
+// Jenkinsfile — Master CI/CD Pipeline
+// Playwright TypeScript Framework
+// Naveen Automation Labs
+// ═══════════════════════════════════════════════════════════════
+
+pipeline {
+    agent any
+
+    tools {
+        nodejs 'NodeJS-24'
+        maven 'Maven-3.9'
+        jdk 'JDK-17'
+        allure 'Allure'
+    }
+
+    parameters {
+        choice(
+            name: 'ENVIRONMENT',
+            choices: ['QA', 'dev', 'stage'],
+            description: 'Select environment to run tests'
+        )
+        // choice(
+        //     name: 'BROWSER',
+        //     choices: ['chromium', 'firefox', 'webkit'],
+        //     description: 'Select browser'
+        // )
+        // choice(
+        //     name: 'TEST_SUITE',
+        //     choices: ['all', 'smoke', 'regression', 'api-smoke'],
+        //     description: 'Select test suite'
+        // )
+    }
+
+    environment {
+        SLACK_CHANNEL = '#general'
+    }
+
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '20'))
+        disableConcurrentBuilds()
+    }
+
+    stages {
+
+        // ═════════════════════════════════════════════════
+        // STAGE 1: BUILD APP + UNIT TESTS
+        // ═════════════════════════════════════════════════
+        stage('Build & Unit Tests') {
+            steps {
+                echo "========================================="
+                echo "  Building App + Running Unit Tests"
+                echo "========================================="
+                dir('dev-app') {
+                    git url: 'https://github.com/jglick/simple-maven-project-with-tests.git',
+                        branch: 'master'
+                    sh 'mvn clean install -Dmaven.test.failure.ignore=true'
+                }
+            }
+            post {
+                always {
+                    junit 'dev-app/target/surefire-reports/*.xml'
+                }
+            }
+        }
+
+        // ═════════════════════════════════════════════════
+        // STAGE 2: INSTALL PLAYWRIGHT DEPENDENCIES
+        // ═════════════════════════════════════════════════
+        stage('Install Dependencies') {
+            steps {
+                echo "========================================="
+                echo "  Installing Playwright Dependencies"
+                echo "========================================="
+                dir('qa-tests') {
+                    git url: 'https://github.com/Prateek985/LambdaTestFramework.git',
+                        branch: 'main'
+                    sh 'npm ci'
+                    sh 'npx playwright install --with-deps chromium'
+                }
+            }
+        }
+
+        // ═════════════════════════════════════════════════
+        // STAGE 4: DEPLOY QA + REGRESSION
+        // ═════════════════════════════════════════════════
+        stage('Deploy to QA') {
+            steps {
+                echo "========================================="
+                echo "  Deploying to QA..."
+                echo "========================================="
+                echo "QA deployment complete ✅"
+            }
+        }
+
+        stage('QA - Regression Tests') {
+            steps {
+                echo "========================================="
+                echo "  Running REGRESSION (all tests) on QA"
+                echo "========================================="
+                dir('qa-tests') {
+                    sh 'rm -rf allure-results reports'
+                    withCredentials([
+                        usernamePassword(credentialsId: 'qa-credentials',
+                            usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')
+                    ]) {
+                        sh '''
+                            ENV=qa \
+                            BASE_URL=$BASE_URL \
+                            USERNAME=$USERNAME \
+                            PASSWORD=$PASSWORD \
+                            npx playwright test --project=chromium
+                        '''
+                    }
+                }
+            }
+            post {
+                always {
+                    sh 'mkdir -p reports-qa/html reports-qa/allure'
+                    sh 'cp -r qa-tests/reports/html-report/* reports-qa/html/ || true'
+                    sh 'allure generate qa-tests/allure-results --clean -o reports-qa/allure || true'
+                    publishHTML(target: [
+                        reportName: 'QA Regression - PW HTML Report',
+                        reportDir: 'reports-qa/html',
+                        reportFiles: 'index.html',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true
+                    ])
+                    publishHTML(target: [
+                        reportName: 'QA Regression - Allure Report',
+                        reportDir: 'reports-qa/allure',
+                        reportFiles: 'index.html',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true
+                    ])
+                }
+            }
+        }
+
+        // ═════════════════════════════════════════════════
+        // STAGE 5: DEPLOY STAGE + SANITY
+        // ═════════════════════════════════════════════════
+        stage('Deploy to STAGE') {
+            steps {
+                echo "========================================="
+                echo "  Deploying to STAGE..."
+                echo "========================================="
+                echo "STAGE deployment complete ✅"
+            }
+        }
+
+        stage('STAGE - Sanity Tests') {
+            steps {
+                echo "========================================="
+                echo "  Running SANITY @smoke on STAGE"
+                echo "========================================="
+                dir('qa-tests') {
+                    sh 'rm -rf allure-results reports'
+                    withCredentials([
+                        usernamePassword(credentialsId: 'stage-credentials',
+                            usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')
+                    ]) {
+                        sh '''
+                            ENV=stage \
+                            BASE_URL=$BASE_URL \
+                            USERNAME=$USERNAME \
+                            PASSWORD=$PASSWORD \
+                            npx playwright test --project=chromium 
+                        '''
+                    }
+                }
+            }
+            post {
+                always {
+                    sh 'mkdir -p reports-stage/html reports-stage/allure'
+                    sh 'cp -r qa-tests/reports/html-report/* reports-stage/html/ || true'
+                    sh 'allure generate qa-tests/allure-results --clean -o reports-stage/allure || true'
+                    publishHTML(target: [
+                        reportName: 'STAGE Sanity - PW HTML Report',
+                        reportDir: 'reports-stage/html',
+                        reportFiles: 'index.html',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true
+                    ])
+                    publishHTML(target: [
+                        reportName: 'STAGE Sanity - Allure Report',
+                        reportDir: 'reports-stage/allure',
+                        reportFiles: 'index.html',
+                        keepAll: true,
+                        alwaysLinkToLastBuild: true
+                    ])
+                }
+            }
+        }
+
+🎭 *Playwright CI/CD Pipeline Report*
+
+*Overall: ${statusEmoji} ${buildStatus}*
+*Environment:* `${params.ENVIRONMENT}`
+*Branch:* `${env.BRANCH_NAME ?: 'main'}`
+*Build:* #${env.BUILD_NUMBER}
+*Duration:* ${currentBuild.durationString.replace(' and counting', '')}
+
+📊 <${env.BUILD_URL}|View Reports in Jenkins>
+🔍 <${env.BUILD_URL}console|View Console Logs>
+                    """
+                
+        success {
+            echo '═══════════════════════════════════════════'
+            echo '  PIPELINE: ✅ SUCCESS'
+            echo '═══════════════════════════════════════════'
+        }
+        failure {
+            echo '═══════════════════════════════════════════'
+            echo '  PIPELINE: ❌ FAILED'
+            echo '═══════════════════════════════════════════'
+        }
+    }
+}
