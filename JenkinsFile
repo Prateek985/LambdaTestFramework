@@ -76,7 +76,7 @@ pipeline {
                 echo "========================================="
                 dir('qa-tests') {
                     git url: 'https://github.com/Prateek985/LambdaTestFramework.git',
-                        branch: 'main'
+                        branch: 'master'
                     sh 'npm ci'
                     sh 'npx playwright install --with-deps chromium'
                 }
