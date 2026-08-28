@@ -133,7 +133,7 @@ pipeline {
             post {
                 always {
                     bat 'md reports-dev\\html reports-dev\\allure'
-                    bat 'cp -r qa-tests/reports/html-report/* reports-dev/html/ || true'
+                    bat 'xcopy /s /e /y qa-tests\\reports\\html-report reports-dev\\html'
                     bat 'allure generate qa-tests/allure-results --clean -o reports-dev/allure || true'
                     publishHTML(target: [
                         reportName: 'DEV Sanity - PW HTML Report',
