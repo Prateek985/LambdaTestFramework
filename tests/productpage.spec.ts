@@ -5,7 +5,7 @@ import process from 'process';
 test.beforeEach(async ({ loginPage, homePage, searchResultsPage }) => {
      test.setTimeout(60000);
      await loginPage.goToLoginPage();
-     await loginPage.doLogin(process.env.USERNAMEQ!, process.env.PASSWORDQ!);
+     await loginPage.doLogin(process.env.Email!, process.env.PASSWORD!);
      await homePage.dosearch(process.env.searchkey!);
      await searchResultsPage.selectProduct(process.env.productName!);
      

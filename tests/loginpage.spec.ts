@@ -19,7 +19,7 @@ test('forget password link exist test', async ({loginPage}) =>{
 });
 
 test('User is able to login to app test', async ({loginPage, homePage}) => {
-     await loginPage.doLogin(process.env.USERNAMEQ!, process.env.PASSWORDQ!);
+     await loginPage.doLogin(process.env.Email!, process.env.PASSWORD!);
      expect(await homePage.getHomePageTitle()).toBe('Your Store');
 });
 
