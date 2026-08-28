@@ -105,12 +105,19 @@ pipeline {
                     bat 'if exist reports rmdir /s /q reports'
                     withCredentials([
                         usernamePassword(credentialsId: 'dev-credentials',
-                            usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')
+                            EmailVariable: 'Email', passwordVariable: 'PASSWORD'),
+                        string(credentialsId: 'BASE_URL', variable: 'BASE_URL'),
+                        string(credentialsId: 'searchkey', variable: 'searchkey'),
+                        string(credentialsId: 'productName', variable: 'productName'),
+                        string(credentialsId: 'ProductHeader', variable: 'ProductHeader'),
+                        string(credentialsId: 'Brand', variable: 'Brand'),
+                        string(credentialsId: 'RewardPoints', variable: 'RewardPoints'),
+                        string(credentialsId: 'Availability', variable: 'Availability')
                     ]) {
                         bat '''
                             set ENV=dev
                             set BASE_URL=%BASE_URL%
-                            set USERNAME=%USERNAME%
+                            set Email=%Email%
                             set PASSWORD=%PASSWORD%
                             set searchkey=%searchkey%
                             set productName=%productName%
@@ -167,12 +174,12 @@ pipeline {
                     bat 'rm -rf allure-results reports'
                     withCredentials([
                         usernamePassword(credentialsId: 'qa-credentials',
-                            usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')
+                            EmailVariable: 'Email', passwordVariable: 'PASSWORD')
                     ]) {
                         bat '''
                             ENV=qa \
                             set BASE_URL=%BASE_URL%
-                            set USERNAME=%USERNAME%
+                            set Email=%Email%
                             set PASSWORD=%PASSWORD%
                             set searchkey=%searchkey%
                             set productName=%productName%
