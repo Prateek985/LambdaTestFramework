@@ -132,6 +132,7 @@ pipeline {
             }
             post {
                 always {
+                    bat 'if exist reports-dev rmdir /s /q reports-dev'
                     bat 'md reports-dev\\html reports-dev\\allure'
                     bat 'xcopy /s /e /y qa-tests\\reports\\html-report reports-dev\\html'
                     bat 'allure generate qa-tests/allure-results --clean -o reports-dev/allure || true'
