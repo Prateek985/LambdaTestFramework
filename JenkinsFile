@@ -112,6 +112,12 @@ pipeline {
                             set BASE_URL=%BASE_URL%
                             set USERNAME=%USERNAME%
                             set PASSWORD=%PASSWORD%
+                            set searchkey=%searchkey%
+                            set productName=%productName%
+                            set ProductHeader=%ProductHeader%
+                            set Brand=%Brand%
+                            set RewardPoints=%RewardPoints%
+                            set Availability=%Availability%
                             npx playwright test --project=chromium --grep @smoke
                         '''
                     }
@@ -165,9 +171,15 @@ pipeline {
                     ]) {
                         bat '''
                             ENV=qa \
-                            BASE_URL=$BASE_URL \
-                            USERNAME=$USERNAME \
-                            PASSWORD=$PASSWORD \
+                            set BASE_URL=%BASE_URL%
+                            set USERNAME=%USERNAME%
+                            set PASSWORD=%PASSWORD%
+                            set searchkey=%searchkey%
+                            set productName=%productName%
+                            set ProductHeader=%ProductHeader%
+                            set Brand=%Brand%
+                            set RewardPoints=%RewardPoints%
+                            set Availability=%Availability%
                             npx playwright test --project=chromium
                         '''
                     }
