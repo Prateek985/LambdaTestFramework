@@ -118,7 +118,7 @@ pipeline {
                             set Brand=%Brand%
                             set RewardPoints=%RewardPoints%
                             set Availability=%Availability%
-                            npx playwright test --project=chromium --grep @smoke
+                            npx playwright test --project=chromium
                         '''
                     }
                 }
