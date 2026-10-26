@@ -84,9 +84,12 @@ test('@regression DELETE - delete a user', async ({ apiHelper }) => {
 test('@regression PATCH - update a user', async ({ apiHelper }) => {
     //create a user: POST
     let userResponse = await createUser(apiHelper);
+    let userPatchUpdated = {
+        status: 'active'
+    };
 
     //update the user:
-    let response = await apiHelper.Patch(`/public/v2/users/${userResponse.id}`, AUTH_HEADER);
+    let response = await apiHelper.Patch(`/public/v2/users/${userResponse.id}`, userPatchUpdated,  AUTH_HEADER);
     expect(response.status).toBe(200);
 
     //get the user:

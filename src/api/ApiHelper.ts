@@ -59,7 +59,7 @@ export class ApiHelper {
     }
 
      //PATCH
-    async Patch(endPoint: string, headers?: Record<string, string>) {
+    async Patch(endPoint: string, data: object, headers?: Record<string, string>) {
         let response = await this.request.patch(`${this.baseURL}${endPoint}`, {
             headers: headers
         });
